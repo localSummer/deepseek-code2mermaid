@@ -9,34 +9,34 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import pkg from './package.json'
 
 const dir =
-    typeof __dirname === 'string'
-        ? __dirname
-        : dirname(fileURLToPath(import.meta.url))
+	typeof __dirname === 'string'
+		? __dirname
+		: dirname(fileURLToPath(import.meta.url))
 
 const resolvePath = (...paths: string[]) => path.resolve(dir, ...paths)
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
-    process.env.APP_BUILD_TIME = `${Date.now()}`
-    process.env.APP_VERSION = pkg.version
+	process.env.APP_BUILD_TIME = `${Date.now()}`
+	process.env.APP_VERSION = pkg.version
 
-    return {
-        plugins: [
-            tsconfigPaths(),
-            react(),
-            vscode({
-                extension: {
-                    entry: resolvePath('./src/extension.ts'),
-                    platform: 'node',
-                    target: 'node18',
-                    sourcemap: true,
-                    skipNodeModulesBundle: false
-                    // treeshake: {
-                    //   preset: 'smallest',
-                    //   moduleSideEffects: 'no-external'
-                    // }
-                }
-            })
-        ]
-    }
+	return {
+		plugins: [
+			tsconfigPaths(),
+			react(),
+			vscode({
+				extension: {
+					entry: resolvePath('./src/extension.ts'),
+					platform: 'node',
+					target: 'node18',
+					sourcemap: true,
+					skipNodeModulesBundle: false
+					// treeshake: {
+					//   preset: 'smallest',
+					//   moduleSideEffects: 'no-external'
+					// }
+				}
+			})
+		]
+	}
 })
