@@ -1,0 +1,110 @@
+{
+  "publisher": "wangxingwen",
+  "name": "deepseek-code2mermaid",
+  "displayName": "deepseek-code2mermaid",
+  "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
+  "version": "0.0.1-beta.1",
+  "author": "wangxingwen <wangxingwen@liepin.com>",
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/localSummer/deepseek-code2mermaid"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.generateMermaidDiagramFromSelection",
+        "title": "Generate Mermaid Diagram (Selection)",
+        "category": "Mermaid DeepSeek"
+      },
+      {
+        "command": "extension.generateMermaidDiagramFromFile",
+        "title": "Generate Mermaid Diagram (File)",
+        "category": "Mermaid DeepSeek"
+      },
+      {
+        "command": "extension.generateMermaidDiagramFromFolder",
+        "title": "Generate Mermaid Diagram (Folder)",
+        "category": "Mermaid DeepSeek"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "extension.generateMermaidDiagramFromSelection",
+          "group": "mermaidDeepSeek",
+          "when": "editorTextFocus"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "extension.generateMermaidDiagramFromFile",
+          "group": "mermaidDeepSeek",
+          "when": "resourceFilename"
+        },
+        {
+          "command": "extension.generateMermaidDiagramFromFolder",
+          "group": "mermaidDeepSeek",
+          "when": "resourceIsFolder"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Mermaid DeepSeek Diagram Generator",
+      "properties": {
+        "mermaidDeepseek.openaiBaseUrl": {
+          "type": "string",
+          "default": "https://api.deepseek.com",
+          "description": "Base URL for DeepSeek API."
+        },
+        "mermaidDeepseek.openaiKey": {
+          "type": "string",
+          "description": "API Key for DeepSeek API."
+        },
+        "mermaidDeepseek.openaiModel": {
+          "type": "string",
+          "default": "deepseek-chat",
+          "description": "Model to use for DeepSeek API."
+        },
+        "mermaidDeepseek.deepseekPrompt": {
+          "type": "string",
+          "default": "请根据以下代码的执行流程，生成 mermaid 流程图代码，只输出 mermaid 代码，不要包含其他任何文字和markdown格式：\n",
+          "description": "Prompt for DeepSeek to generate Mermaid code."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "compile:pack": "vsce package -o out/deepseek-code2mermaid.vsix --no-dependencies",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.78.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.2.1"
+  },
+  "dependencies": {
+    "openai": "^4.24.1"
+  }
+}
