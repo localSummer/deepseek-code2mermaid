@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 				let allText = '';
 				for (const fileUri of files) {
 					const document = await vscode.workspace.openTextDocument(fileUri);
-					allText += document.getText() + '\n';
+					allText += document.getText() + '\n\n----------Split File Line----------';
 				}
 				if (allText) {
 					await generateMermaidDiagram(allText, context);

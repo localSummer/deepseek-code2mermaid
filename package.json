@@ -3,10 +3,10 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.3",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
-    "vscode": "^1.78.0"
+    "vscode": "^1.82.0"
   },
   "categories": [
     "Programming Languages"
@@ -93,16 +93,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.78.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "1.82.0",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
-    "eslint": "^9.19.0",
-    "typescript": "^5.7.3",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^3.2.1"
+    "@vscode/vsce": "^2.31.1",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "openai": "^4.24.1"
