@@ -3,7 +3,8 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.9",
+  "packageManager": "npm@10.5.0",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
     "vscode": "^1.82.0"
@@ -22,39 +23,35 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.generateMermaidDiagramFromSelection",
-        "title": "Generate Mermaid Diagram (Selection)",
-        "category": "Mermaid DeepSeek"
+        "command": "deepseek.generateMermaidDiagramFromSelection",
+        "title": "Generate Mermaid Diagram (Selection)"
       },
       {
-        "command": "extension.generateMermaidDiagramFromFile",
-        "title": "Generate Mermaid Diagram (File)",
-        "category": "Mermaid DeepSeek"
+        "command": "deepseek.generateMermaidDiagramFromFile",
+        "title": "Generate Mermaid Diagram (File)"
       },
       {
-        "command": "extension.generateMermaidDiagramFromFolder",
-        "title": "Generate Mermaid Diagram (Folder)",
-        "category": "Mermaid DeepSeek"
+        "command": "deepseek.generateMermaidDiagramFromFolder",
+        "title": "Generate Mermaid Diagram (Folder)"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "extension.generateMermaidDiagramFromSelection",
+          "command": "deepseek.generateMermaidDiagramFromSelection",
           "group": "mermaidDeepSeek",
           "when": "editorTextFocus"
         }
       ],
       "explorer/context": [
         {
-          "command": "extension.generateMermaidDiagramFromFile",
-          "group": "mermaidDeepSeek",
-          "when": "resourceFilename"
+          "command": "deepseek.generateMermaidDiagramFromFile",
+          "group": "mermaidDeepSeek"
         },
         {
-          "command": "extension.generateMermaidDiagramFromFolder",
+          "command": "deepseek.generateMermaidDiagramFromFolder",
           "group": "mermaidDeepSeek",
-          "when": "resourceIsFolder"
+          "when": "explorerResourceIsFolder || selectedFilesCount > 0"
         }
       ]
     },

@@ -3,7 +3,7 @@ import { OpenAI } from 'openai';
 
 export function activate(context: vscode.ExtensionContext) {
 	// Command to generate diagram from selection
-	let generateFromSelection = vscode.commands.registerCommand('extension.generateMermaidDiagramFromSelection', async () => {
+	let generateFromSelection = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromSelection', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
 			const selection = editor.selection;
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// Command to generate diagram from file
-	let generateFromFile = vscode.commands.registerCommand('extension.generateMermaidDiagramFromFile', async (uri: vscode.Uri) => {
+	let generateFromFile = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFile', async (uri: vscode.Uri) => {
 		if (uri && uri.fsPath) {
 			try {
 				const document = await vscode.workspace.openTextDocument(uri);
@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// Command to generate diagram from folder (for simplicity, reads all files in folder and concatenates)
-	let generateFromFolder = vscode.commands.registerCommand('extension.generateMermaidDiagramFromFolder', async (uri: vscode.Uri) => {
+	let generateFromFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFolder', async (uri: vscode.Uri) => {
 		if (uri && uri.fsPath) {
 			try {
 				const files = await vscode.workspace.findFiles(new vscode.RelativePattern(uri.fsPath, '**/*'));
