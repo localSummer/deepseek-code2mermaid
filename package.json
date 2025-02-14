@@ -3,7 +3,7 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.9",
+  "version": "0.0.1-beta.11",
   "packageManager": "npm@10.5.0",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
@@ -19,7 +19,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension/extension.js",
   "contributes": {
     "commands": [
       {
@@ -82,24 +82,34 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "compile:pack": "vsce package -o out/deepseek-code2mermaid.vsix --no-dependencies",
+    "compile": "vite build",
+    "compile:pack": "vsce package -o dist/deepseek-code2mermaid.vsix --no-dependencies",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@tomjs/vite-plugin-vscode": "^2.5.5",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@types/vscode": "1.82.0",
+    "@types/vscode-webview": "^1.57.5",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "@vscode/vsce": "^2.31.1",
+    "@vscode/webview-ui-toolkit": "^1.4.0",
     "eslint": "^9.19.0",
-    "typescript": "^5.7.3"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.0",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "dependencies": {
     "openai": "^4.24.1"

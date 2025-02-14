@@ -73,7 +73,7 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
 
 	const openai = new OpenAI({
 		apiKey: openaiKey,
-		baseURL: openaiBaseUrl,
+		baseURL: openaiBaseUrl
 	});
 
 	vscode.window.withProgress({
@@ -85,6 +85,7 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
 			progress.report({ increment: 0, message: 'Calling DeepSeek API...' });
 			const completion = await openai.chat.completions.create({
 				model: openaiModel || "deepseek-chat",
+				temperature: 0.3,
 				messages: [{ role: "user", content: deepseekPrompt + inputText }],
 			});
 

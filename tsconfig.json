@@ -1,17 +1,61 @@
 {
   "compilerOptions": {
-    "module": "Node16",
-    "target": "ES2022",
-    "outDir": "out",
     "lib": [
-      "ES2022"
+      "DOM",
+      "DOM.Iterable",
+      "esnext"
     ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "target": "es2020",
+    "outDir": "dist",
     "sourceMap": true,
-    "rootDir": "src",
-    "strict": true, /* enable all strict type-checking options */
     "esModuleInterop": true,
-    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "checkJs": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-  }
+    "noEmit": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "types": [
+      "vite/client",
+      "@types/vscode-webview"
+    ],
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "src/**/*.json",
+    "*.json",
+    "*.ts",
+    "*.js",
+    "*.cjs",
+    "*.mjs",
+    "vite.config.mts"
+  ],
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "cz-adapter.cjs"
+  ]
 }
