@@ -27,10 +27,33 @@ export function activate(context: vscode.ExtensionContext) {
   // Command to generate diagram from file
   let generateFromFile = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFile', async (uri: vscode.Uri) => {
     if (uri && uri.fsPath) {
+      // 根据uri.fsPath获取文件的绝对路径
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
+      // 基于 workspacePath获取 url.fsPath 绝对路径
+      const absolutePath = path.resolve(workspacePath, uri.fsPath)
+      const repomixCommand = `npx repomix --include "${absolutePath}" --output dp-mermaid-prompt.md --style markdown`
+
       try {
-        const document = await vscode.workspace.openTextDocument(uri);
-        const text = document.getText();
-        await generateMermaidDiagram(text, context);
+        const { stderr } = await execAsync(repomixCommand, {
+          cwd: workspacePath // 在工作区根目录执行
+        });
+        // 显示执行结果
+        if (stderr) {
+          vscode.window.showWarningMessage(
+            `Command repomixCommand stderr: ${stderr}`
+          )
+        }
+
+        // Read the prompt data from the repomix file
+        const repomixFilePath = path.join(workspacePath, 'dp-mermaid-prompt.md')
+        // 读取文件内容
+        const promptData = await vscode.workspace.fs.readFile(
+          vscode.Uri.file(repomixFilePath)
+        )
+
+        // Parse the prompt data and update the result object
+        const promptDataString = promptData.toString()
+        await generateMermaidDiagram(promptDataString, context);
       } catch (error) {
         vscode.window.showErrorMessage(`Error reading file: ${error}`);
       }
@@ -42,18 +65,33 @@ export function activate(context: vscode.ExtensionContext) {
   // Command to generate diagram from folder (for simplicity, reads all files in folder and concatenates)
   let generateFromFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFolder', async (uri: vscode.Uri) => {
     if (uri && uri.fsPath) {
+      // 根据uri.fsPath获取文件的绝对路径
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
+      // 基于 workspacePath获取 url.fsPath 绝对路径
+      const absolutePath = path.resolve(workspacePath, uri.fsPath)
+      const repomixCommand = `npx repomix --include "${absolutePath}" --output dp-mermaid-prompt.md --style markdown`
+
       try {
-        const files = await vscode.workspace.findFiles(new vscode.RelativePattern(uri.fsPath, '**/*'));
-        let allText = '';
-        for (const fileUri of files) {
-          const document = await vscode.workspace.openTextDocument(fileUri);
-          allText += document.getText() + '\n\n----------Split File Line----------';
+        const { stderr } = await execAsync(repomixCommand, {
+          cwd: workspacePath // 在工作区根目录执行
+        });
+        // 显示执行结果
+        if (stderr) {
+          vscode.window.showWarningMessage(
+            `Command repomixCommand stderr: ${stderr}`
+          )
         }
-        if (allText) {
-          await generateMermaidDiagram(allText, context);
-        } else {
-          vscode.window.showInformationMessage('No text content found in folder.');
-        }
+
+        // Read the prompt data from the repomix file
+        const repomixFilePath = path.join(workspacePath, 'dp-mermaid-prompt.md')
+        // 读取文件内容
+        const promptData = await vscode.workspace.fs.readFile(
+          vscode.Uri.file(repomixFilePath)
+        )
+
+        // Parse the prompt data and update the result object
+        const promptDataString = promptData.toString()
+        await generateMermaidDiagram(promptDataString, context);
       } catch (error) {
         vscode.window.showErrorMessage(`Error reading folder: ${error}`);
       }
@@ -148,9 +186,9 @@ function getWebviewContent(mermaidCode: string) {
 		</script>
     </head>
     <body>
-        <div class="mermaid">
-			${mermaidCode}
-		</div>
+      <div class="mermaid">
+			  ${mermaidCode}
+		  </div>
     </body>
     </html>`;
 }
