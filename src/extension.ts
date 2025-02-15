@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import { OpenAI } from 'openai';
+import path from 'path';
+import { defaultMermaidPrompt } from './prompt';
 
 export function activate(context: vscode.ExtensionContext) {
 	// Command to generate diagram from selection
@@ -64,7 +66,7 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
 	const openaiBaseUrl = config.get<string>('openaiBaseUrl');
 	const openaiKey = config.get<string>('openaiKey');
 	const openaiModel = config.get<string>('openaiModel');
-	const deepseekPrompt = config.get<string>('deepseekPrompt') || "请根据以下代码，生成 mermaid 流程图代码，只输出 mermaid 代码，不要包含其他任何文字和markdown格式：\n"; // Default prompt
+	const deepseekPrompt = config.get<string>('deepseekPrompt') || `${defaultMermaidPrompt}\n`;
 
 	if (!openaiKey) {
 		vscode.window.showErrorMessage('DeepSeek API Key is not configured. Please set it in settings.');
@@ -89,7 +91,16 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
 				messages: [{ role: "user", content: deepseekPrompt + inputText }],
 			});
 
-			const mermaidCode = completion.choices[0]?.message?.content;
+			let mermaidCode = completion.choices[0]?.message?.content;
+
+			if (mermaidCode) {
+				const regex = /```mermaid\s+(.*?)\s+```/s;
+				const match = mermaidCode.match(regex);
+				if (match) {
+					const extractedText = match[1]!.trim();
+					mermaidCode = extractedText;
+				}
+			}
 
 			if (mermaidCode) {
 				progress.report({ increment: 100, message: 'Rendering Mermaid Diagram...' });
@@ -127,18 +138,15 @@ function getWebviewContent(mermaidCode: string) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mermaid Preview</title>
+		<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+		<script>
+			mermaid.initialize({ startOnLoad: true });
+		</script>
     </head>
     <body>
-        <div id="mermaid" class="mermaid"></div>
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-        <script>
-            mermaid.initialize({ startOnLoad: true });
-			document.addEventListener('DOMContentLoaded', function() {
-				const mermaidDiv = document.getElementById('mermaid');
-				mermaidDiv.textContent = \`${mermaidCode}\`;
-				mermaid.init(undefined, mermaidDiv);
-			});
-        </script>
+        <div class="mermaid">
+			${mermaidCode}
+		</div>
     </body>
     </html>`;
 }
