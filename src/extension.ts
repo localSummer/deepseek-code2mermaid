@@ -3,7 +3,8 @@ import { OpenAI } from 'openai';
 import { exec } from 'child_process'
 import path from 'path'
 import { promisify } from 'util'
-import { defaultMermaidPrompt } from './prompt';
+import { defaultMermaidPrompt } from './prompts';
+import { repomixFileName } from './constants';
 
 const execAsync = promisify(exec)
 
@@ -27,11 +28,11 @@ export function activate(context: vscode.ExtensionContext) {
   // Command to generate diagram from file
   let generateFromFile = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFile', async (uri: vscode.Uri) => {
     if (uri && uri.fsPath) {
-      // 根据uri.fsPath获取文件的绝对路径
+      // 根据uri.fsPath获取工作目录的绝对路径
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
       // 基于 workspacePath获取 url.fsPath 绝对路径
       const absolutePath = path.resolve(workspacePath, uri.fsPath)
-      const repomixCommand = `npx repomix --include "${absolutePath}" --output dp-mermaid-prompt.md --style markdown`
+      const repomixCommand = `npx repomix --include "${absolutePath}" --output ${repomixFileName} --style markdown`
 
       try {
         const { stderr } = await execAsync(repomixCommand, {
@@ -45,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         // Read the prompt data from the repomix file
-        const repomixFilePath = path.join(workspacePath, 'dp-mermaid-prompt.md')
+        const repomixFilePath = path.join(workspacePath, repomixFileName)
         // 读取文件内容
         const promptData = await vscode.workspace.fs.readFile(
           vscode.Uri.file(repomixFilePath)
@@ -65,11 +66,11 @@ export function activate(context: vscode.ExtensionContext) {
   // Command to generate diagram from folder (for simplicity, reads all files in folder and concatenates)
   let generateFromFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFolder', async (uri: vscode.Uri) => {
     if (uri && uri.fsPath) {
-      // 根据uri.fsPath获取文件的绝对路径
+      // 根据uri.fsPath获取工作目录的绝对路径
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
       // 基于 workspacePath获取 url.fsPath 绝对路径
       const absolutePath = path.resolve(workspacePath, uri.fsPath)
-      const repomixCommand = `npx repomix --include "${absolutePath}" --output dp-mermaid-prompt.md --style markdown`
+      const repomixCommand = `npx repomix --include "${absolutePath}" --output ${repomixFileName} --style markdown`
 
       try {
         const { stderr } = await execAsync(repomixCommand, {
@@ -83,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         // Read the prompt data from the repomix file
-        const repomixFilePath = path.join(workspacePath, 'dp-mermaid-prompt.md')
+        const repomixFilePath = path.join(workspacePath, repomixFileName)
         // 读取文件内容
         const promptData = await vscode.workspace.fs.readFile(
           vscode.Uri.file(repomixFilePath)
