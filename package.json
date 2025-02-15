@@ -51,7 +51,7 @@
         {
           "command": "deepseek.generateMermaidDiagramFromFolder",
           "group": "mermaidDeepSeek",
-          "when": "explorerResourceIsFolder || selectedFilesCount > 0"
+          "when": "explorerResourceIsFolder"
         }
       ]
     },
@@ -107,6 +107,7 @@
     "eslint": "^9.19.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "repomix": "^0.2.26",
     "typescript": "^5.7.3",
     "vite": "^5.4.0",
     "vite-tsconfig-paths": "^5.0.1"
