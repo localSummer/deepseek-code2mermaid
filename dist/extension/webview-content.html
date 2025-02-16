@@ -49,6 +49,9 @@
     <button class="control-btn" onclick="zoomOut()">
       <span class="codicon codicon-zoom-out"></span>
     </button>
+    <button class="control-btn" onclick="downloadSVG()">
+      <span class="codicon codicon-cloud-download"></span>
+    </button>
   </div>
   <div id="diagram-container">
     <div class="mermaid">${mermaidCode}</div>
@@ -70,6 +73,26 @@
     function updateZoom() {
       container.style.transform = `scale(${scale})`;
     }
+
+    function downloadSVG() {
+      const svgElement = document.querySelector('.mermaid svg');
+      if (!svgElement) {
+        console.error('没有找到SVG元素');
+        return;
+      }
+
+      // 获取SVG内容
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+
+      // 通过 vscode webview API 发送消息到插件
+      vscode.postMessage({
+        command: 'downloadSVG',
+        data: svgData
+      });
+    }
+  </script>
+  <script>
+    const vscode = acquireVsCodeApi();
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vscode-codicons/dist/codicon.css" />
 </body>
