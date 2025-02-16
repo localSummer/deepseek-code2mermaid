@@ -3,7 +3,7 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.41",
+  "version": "0.0.1-beta.42",
   "packageManager": "npm@10.5.0",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
@@ -27,12 +27,8 @@
         "title": "Generate Mermaid Diagram (Selection)"
       },
       {
-        "command": "deepseek.generateMermaidDiagramFromFile",
-        "title": "Generate Mermaid Diagram (File)"
-      },
-      {
-        "command": "deepseek.generateMermaidDiagramFromFolder",
-        "title": "Generate Mermaid Diagram (Folder)"
+        "command": "deepseek.generateMermaidDiagram",
+        "title": "Generate Mermaid Diagram"
       }
     ],
     "menus": {
@@ -45,13 +41,8 @@
       ],
       "explorer/context": [
         {
-          "command": "deepseek.generateMermaidDiagramFromFile",
+          "command": "deepseek.generateMermaidDiagram",
           "group": "mermaidDeepSeek"
-        },
-        {
-          "command": "deepseek.generateMermaidDiagramFromFolder",
-          "group": "mermaidDeepSeek",
-          "when": "explorerResourceIsFolder"
         }
       ]
     },
@@ -74,7 +65,6 @@
         },
         "mermaidDeepseek.deepseekPrompt": {
           "type": "string",
-          "default": "请根据以下代码的执行流程，生成 mermaid 流程图代码，只输出 mermaid 代码，不要包含其他任何文字和markdown格式：\n",
           "description": "Prompt for DeepSeek to generate Mermaid code."
         }
       }

@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Command to generate diagram from file
-  let generateFromFile = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFile', async (uri: vscode.Uri) => {
+  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uri: vscode.Uri) => {
     if (uri && uri.fsPath) {
       // 根据uri.fsPath获取工作目录的绝对路径
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
@@ -64,45 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  // Command to generate diagram from folder (for simplicity, reads all files in folder and concatenates)
-  let generateFromFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromFolder', async (uri: vscode.Uri) => {
-    if (uri && uri.fsPath) {
-      // 根据uri.fsPath获取工作目录的绝对路径
-      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
-      // 基于 workspacePath获取 url.fsPath 绝对路径
-      const absolutePath = path.resolve(workspacePath, uri.fsPath)
-      const repomixCommand = `npx repomix --include "${absolutePath}" --output ${repomixFileName} --style markdown`
-
-      try {
-        const { stderr } = await execAsync(repomixCommand, {
-          cwd: workspacePath // 在工作区根目录执行
-        });
-        // 显示执行结果
-        if (stderr) {
-          vscode.window.showWarningMessage(
-            `Command repomixCommand stderr: ${stderr}`
-          )
-        }
-
-        // Read the prompt data from the repomix file
-        const repomixFilePath = path.join(workspacePath, repomixFileName)
-        // 读取文件内容
-        const promptData = await vscode.workspace.fs.readFile(
-          vscode.Uri.file(repomixFilePath)
-        )
-
-        // Parse the prompt data and update the result object
-        const promptDataString = promptData.toString()
-        await generateMermaidDiagram(promptDataString, context);
-      } catch (error) {
-        vscode.window.showErrorMessage(`Error reading folder: ${error}`);
-      }
-    } else {
-      vscode.window.showInformationMessage('No folder selected.');
-    }
-  });
-
-  context.subscriptions.push(generateFromSelection, generateFromFile, generateFromFolder);
+  context.subscriptions.push(generateFromSelection, generateFromFileOrFolder);
 }
 
 async function generateMermaidDiagram(inputText: string, context: vscode.ExtensionContext) {
