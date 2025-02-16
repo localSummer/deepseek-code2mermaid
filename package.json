@@ -3,7 +3,7 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.42",
+  "version": "0.0.1-beta.44",
   "packageManager": "npm@10.5.0",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
@@ -62,6 +62,11 @@
           "type": "string",
           "default": "deepseek-chat",
           "description": "Model to use for DeepSeek API."
+        },
+        "mermaidDeepSeek.temperature": {
+          "type": "number",
+          "default": 0.3,
+          "description": "Temperature for DeepSeek API."
         },
         "mermaidDeepseek.deepseekPrompt": {
           "type": "string",

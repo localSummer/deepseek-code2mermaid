@@ -36,8 +36,8 @@ export function activate(context: vscode.ExtensionContext) {
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
       // 将所有选中文件的路径转换为绝对路径，并用逗号连接
       const absolutePaths = uriArray
-      .map(uri => path.resolve(workspacePath, uri.fsPath))
-      .join(',');
+        .map(uri => path.resolve(workspacePath, uri.fsPath))
+        .join(',');
       const repomixCommand = `npx repomix --include "${absolutePaths}" --output ${repomixFileName} --style markdown`
 
       try {
@@ -78,6 +78,7 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
   const openaiKey = config.get<string>('openaiKey');
   const openaiModel = config.get<string>('openaiModel');
   const deepseekPrompt = config.get<string>('deepseekPrompt') || `${defaultMermaidPrompt}\n`;
+  const temperature = config.get<number>('temperature');
 
   if (!openaiKey) {
     vscode.window.showErrorMessage('DeepSeek API Key is not configured. Please set it in settings.');
@@ -98,7 +99,7 @@ async function generateMermaidDiagram(inputText: string, context: vscode.Extensi
       progress.report({ increment: 0, message: 'Calling DeepSeek API...' });
       const completion = await openai.chat.completions.create({
         model: openaiModel || "deepseek-chat",
-        temperature: 0.3,
+        temperature,
         messages: [{ role: "user", content: deepseekPrompt + inputText }],
       });
 
