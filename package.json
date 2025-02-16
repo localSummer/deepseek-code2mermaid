@@ -65,7 +65,7 @@
         },
         "mermaidDeepSeek.temperature": {
           "type": "number",
-          "default": 0.3,
+          "default": 0.1,
           "description": "Temperature for DeepSeek API."
         },
         "mermaidDeepseek.deepseekPrompt": {
