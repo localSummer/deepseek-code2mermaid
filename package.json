@@ -3,7 +3,7 @@
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.1-beta.35",
+  "version": "0.0.1-beta.38",
   "packageManager": "npm@10.5.0",
   "author": "wangxingwen <wangxingwen@liepin.com>",
   "engines": {
@@ -81,13 +81,13 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "vite build",
-    "compile:pack": "vsce package -o dist/deepseek-code2mermaid.vsix --no-dependencies",
+    "compile": "vite build && npm run copy-webview",
+    "compile:pack": "npm run compile && vsce package -o dist/deepseek-code2mermaid.vsix --no-dependencies",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "copy-webview": "cp src/webview-content.html dist/extension/"
   },
   "devDependencies": {
     "@tomjs/vite-plugin-vscode": "^2.5.5",
@@ -104,6 +104,7 @@
     "@vscode/test-electron": "^2.4.1",
     "@vscode/vsce": "^2.31.1",
     "@vscode/webview-ui-toolkit": "^1.4.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^9.19.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
