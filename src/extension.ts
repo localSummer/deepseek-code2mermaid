@@ -27,13 +27,18 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Command to generate diagram from file
-  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uri: vscode.Uri) => {
-    if (uri && uri.fsPath) {
+  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uris: vscode.Uri[] | vscode.Uri) => {
+    // 确保 uris 是数组
+    const uriArray = Array.isArray(uris) ? uris : [uris];
+
+    if (uriArray.length > 0) {
       // 根据uri.fsPath获取工作目录的绝对路径
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
-      // 基于 workspacePath获取 url.fsPath 绝对路径
-      const absolutePath = path.resolve(workspacePath, uri.fsPath)
-      const repomixCommand = `npx repomix --include "${absolutePath}" --output ${repomixFileName} --style markdown`
+      // 将所有选中文件的路径转换为绝对路径，并用逗号连接
+      const absolutePaths = uriArray
+      .map(uri => path.resolve(workspacePath, uri.fsPath))
+      .join(',');
+      const repomixCommand = `npx repomix --include "${absolutePaths}" --output ${repomixFileName} --style markdown`
 
       try {
         const { stderr } = await execAsync(repomixCommand, {
