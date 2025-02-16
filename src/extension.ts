@@ -5,7 +5,7 @@ import path from 'path'
 import { promisify } from 'util'
 import fs from 'fs';
 import { defaultMermaidPrompt } from './prompts';
-import { repomixFileName } from './constants';
+import { repomixFileName, downloadSVGFilename } from './constants';
 
 const execAsync = promisify(exec)
 
@@ -179,7 +179,7 @@ function showMermaidPreview(mermaidCode: string, context: vscode.ExtensionContex
         filters: {
           'SVG Files': ['svg']
         },
-        defaultUri: vscode.Uri.file('mermaid-diagram.svg')
+        defaultUri: vscode.Uri.file(downloadSVGFilename)
       });
 
       if (uri) {
