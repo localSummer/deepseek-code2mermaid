@@ -27,45 +27,49 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Command to generate diagram from file
-  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uris: vscode.Uri[] | vscode.Uri) => {
-    // 确保 uris 是数组
-    const uriArray = Array.isArray(uris) ? uris : [uris];
+  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uri: vscode.Uri, selectedUris: vscode.Uri[] = []) => {
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+    if (!workspaceFolder) throw new Error('error.noWorkspace');
+    const selectedItems = selectedUris?.length > 0 ? selectedUris : [uri];
+    if (selectedItems.length === 0) throw new Error('error.noSelection');
 
-    if (uriArray.length > 0) {
-      // 根据uri.fsPath获取工作目录的绝对路径
-      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath!;
-      // 将所有选中文件的路径转换为绝对路径，并用逗号连接
-      const absolutePaths = uriArray
-        .map(uri => path.resolve(workspacePath, uri.fsPath))
-        .join(',');
-      const repomixCommand = `npx repomix --include "${absolutePaths}" --output ${repomixFileName} --style markdown`
+    const selectedFileOrFolders = selectedItems.map(item => item.fsPath);
+    const workspacePath = workspaceFolder.uri.fsPath;
 
-      try {
-        const { stderr } = await execAsync(repomixCommand, {
-          cwd: workspacePath // 在工作区根目录执行
-        });
-        // 显示执行结果
-        if (stderr) {
-          vscode.window.showWarningMessage(
-            `Command repomixCommand stderr: ${stderr}`
-          )
-        }
+    const absoluteFileOrFolders = selectedFileOrFolders.map(fileOrFolder => {
+      const absolutePath = path.isAbsolute(fileOrFolder)
+        ? fileOrFolder
+        : path.join(workspacePath, fileOrFolder);
+      return absolutePath;
+    })
 
-        // Read the prompt data from the repomix file
-        const repomixFilePath = path.join(workspacePath, repomixFileName)
-        // 读取文件内容
-        const promptData = await vscode.workspace.fs.readFile(
-          vscode.Uri.file(repomixFilePath)
+    // Convert fileOrFolders array to string format for the repomix command
+    const filesOrFoldersString = absoluteFileOrFolders.join(',');
+    const repomixCommand = `npx repomix --include "${filesOrFoldersString}" --output ${repomixFileName} --style markdown`
+
+    try {
+      const { stderr } = await execAsync(repomixCommand, {
+        cwd: workspacePath // 在工作区根目录执行
+      });
+      // 显示执行结果
+      if (stderr) {
+        vscode.window.showWarningMessage(
+          `Command repomixCommand stderr: ${stderr}`
         )
-
-        // Parse the prompt data and update the result object
-        const promptDataString = promptData.toString()
-        await generateMermaidDiagram(promptDataString, context);
-      } catch (error) {
-        vscode.window.showErrorMessage(`Error reading file: ${error}`);
       }
-    } else {
-      vscode.window.showInformationMessage('No file selected.');
+
+      // Read the prompt data from the repomix file
+      const repomixFilePath = path.join(workspacePath, repomixFileName)
+      // 读取文件内容
+      const promptData = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(repomixFilePath)
+      )
+
+      // Parse the prompt data and update the result object
+      const promptDataString = promptData.toString()
+      await generateMermaidDiagram(promptDataString, context);
+    } catch (error) {
+      vscode.window.showErrorMessage(`Error reading file: ${error}`);
     }
   });
 
