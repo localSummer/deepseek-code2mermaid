@@ -1,11 +1,11 @@
 {
-  "publisher": "wangxingwen",
+  "publisher": "localSummer",
   "name": "deepseek-code2mermaid",
   "displayName": "deepseek-code2mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
   "version": "0.0.2",
   "packageManager": "npm@10.5.0",
-  "author": "wangxingwen <wangxingwen@liepin.com>",
+  "author": "localSummer <roamingcode@163.com>",
   "engines": {
     "vscode": "^1.82.0"
   },
