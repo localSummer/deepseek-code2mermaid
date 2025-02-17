@@ -3,7 +3,7 @@
 将代码的执行流程转为可在线预览的Mermaid流程图，提升代码的可读性。
 
 #### 插件核心逻辑预览效果图
-[](https://i-blog.csdnimg.cn/direct/d7beec6e29a94b32ac9de75516563fe1.png)
+![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/d7beec6e29a94b32ac9de75516563fe1.png)
 
 ## 功能特点
 
