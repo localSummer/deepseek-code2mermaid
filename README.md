@@ -2,8 +2,7 @@
 
 将代码的执行流程转为可在线预览的Mermaid流程图，提升代码的可读性。
 
-#### 插件核心逻辑预览效果图
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/d7beec6e29a94b32ac9de75516563fe1.png)
+[基于Deepseek大模型落地代码流程可视化功能](https://blog.csdn.net/roamingcode/article/details/145679081?fromshare=blogdetail&sharetype=blogdetail&sharerId=145679081&sharerefer=PC&sharesource=roamingcode&sharefrom=from_link)
 
 ## 功能特点
 
