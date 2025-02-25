@@ -59,9 +59,6 @@
       <div class="mermaid">${mermaidCode}</div>
     </div>
     <script>
-      // 存储原始的 mermaid 代码，用于复制功能
-      const originalMermaidCode = `${mermaidCode}`;
-
       let scale = 1;
       const container = document.getElementById('diagram-container');
 
@@ -100,7 +97,6 @@
         // 通过 vscode webview API 发送消息到插件
         vscode.postMessage({
           command: 'copyMermaidCode',
-          data: originalMermaidCode
         });
       }
     </script>

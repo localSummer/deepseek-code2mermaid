@@ -190,7 +190,7 @@ function showMermaidPreview(
           vscode.window.showInformationMessage('SVG文件已保存！');
         }
       } else if (message.command === 'copyMermaidCode') {
-        vscode.env.clipboard.writeText(message.data).then(
+        vscode.env.clipboard.writeText(mermaidCode).then(
           () => {
             vscode.window.showInformationMessage(
               '已复制 Mermaid 代码到剪贴板！'
