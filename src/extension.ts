@@ -65,6 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.Uri.file(repomixFilePath)
       )
 
+      // 读取内容后删除临时 repomixFilePath 文件
+      await vscode.workspace.fs.delete(vscode.Uri.file(repomixFilePath))
+
       // Parse the prompt data and update the result object
       const promptDataString = promptData.toString()
       await generateMermaidDiagram(promptDataString, context);
