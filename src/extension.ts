@@ -197,7 +197,7 @@ function showMermaidPreview(
             );
           },
           () => {
-            vscode.window.showErrorMessage('复制失败: ');
+            vscode.window.showErrorMessage('复制失败');
           }
         );
       }
