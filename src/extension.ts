@@ -1,172 +1,203 @@
 import * as vscode from 'vscode';
 import { OpenAI } from 'openai';
-import { exec } from 'child_process'
-import path from 'path'
-import { promisify } from 'util'
+import { exec } from 'child_process';
+import path from 'path';
+import { promisify } from 'util';
 import fs from 'fs';
 import { defaultMermaidPrompt } from './prompts';
 import { repomixFileName, downloadSVGFilename } from './constants';
 
-const execAsync = promisify(exec)
+const execAsync = promisify(exec);
 
 export function activate(context: vscode.ExtensionContext) {
   // Command to generate diagram from selection
-  let generateFromSelection = vscode.commands.registerCommand('deepseek.generateMermaidDiagramFromSelection', async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
-      const selection = editor.selection;
-      const text = editor.document.getText(selection);
-      if (text) {
-        await generateMermaidDiagram(text, context);
+  let generateFromSelection = vscode.commands.registerCommand(
+    'deepseek.generateMermaidDiagramFromSelection',
+    async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const text = editor.document.getText(selection);
+        if (text) {
+          await generateMermaidDiagram(text, context);
+        } else {
+          vscode.window.showInformationMessage('No text selected.');
+        }
       } else {
-        vscode.window.showInformationMessage('No text selected.');
+        vscode.window.showInformationMessage('No active text editor.');
       }
-    } else {
-      vscode.window.showInformationMessage('No active text editor.');
     }
-  });
+  );
 
   // Command to generate diagram from file
-  let generateFromFileOrFolder = vscode.commands.registerCommand('deepseek.generateMermaidDiagram', async (uri: vscode.Uri, selectedUris: vscode.Uri[] = []) => {
-    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-    if (!workspaceFolder) throw new Error('error.noWorkspace');
-    const selectedItems = selectedUris?.length > 0 ? selectedUris : [uri];
-    if (selectedItems.length === 0) throw new Error('error.noSelection');
+  let generateFromFileOrFolder = vscode.commands.registerCommand(
+    'deepseek.generateMermaidDiagram',
+    async (uri: vscode.Uri, selectedUris: vscode.Uri[] = []) => {
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+      if (!workspaceFolder) throw new Error('error.noWorkspace');
+      const selectedItems = selectedUris?.length > 0 ? selectedUris : [uri];
+      if (selectedItems.length === 0) throw new Error('error.noSelection');
 
-    const selectedFileOrFolders = selectedItems.map(item => item.fsPath);
-    const workspacePath = workspaceFolder.uri.fsPath;
+      const selectedFileOrFolders = selectedItems.map((item) => item.fsPath);
+      const workspacePath = workspaceFolder.uri.fsPath;
 
-    const absoluteFileOrFolders = selectedFileOrFolders.map(fileOrFolder => {
-      const absolutePath = path.isAbsolute(fileOrFolder)
-        ? fileOrFolder
-        : path.join(workspacePath, fileOrFolder);
-      return absolutePath;
-    })
+      const absoluteFileOrFolders = selectedFileOrFolders.map(
+        (fileOrFolder) => {
+          const absolutePath = path.isAbsolute(fileOrFolder)
+            ? fileOrFolder
+            : path.join(workspacePath, fileOrFolder);
+          return absolutePath;
+        }
+      );
 
-    // Convert fileOrFolders array to string format for the repomix command
-    const filesOrFoldersString = absoluteFileOrFolders.join(',');
-    const repomixCommand = `npx repomix --include "${filesOrFoldersString}" --output ${repomixFileName} --style markdown`
+      // Convert fileOrFolders array to string format for the repomix command
+      const filesOrFoldersString = absoluteFileOrFolders.join(',');
+      const repomixCommand = `npx repomix --include "${filesOrFoldersString}" --output ${repomixFileName} --style markdown`;
 
-    try {
-      const { stderr } = await execAsync(repomixCommand, {
-        cwd: workspacePath // 在工作区根目录执行
-      });
-      // 显示执行结果
-      if (stderr) {
-        vscode.window.showWarningMessage(
-          `Command repomixCommand stderr: ${stderr}`
-        )
+      try {
+        const { stderr } = await execAsync(repomixCommand, {
+          cwd: workspacePath, // 在工作区根目录执行
+        });
+        // 显示执行结果
+        if (stderr) {
+          vscode.window.showWarningMessage(
+            `Command repomixCommand stderr: ${stderr}`
+          );
+        }
+
+        // Read the prompt data from the repomix file
+        const repomixFilePath = path.join(workspacePath, repomixFileName);
+        // 读取文件内容
+        const promptData = await vscode.workspace.fs.readFile(
+          vscode.Uri.file(repomixFilePath)
+        );
+
+        // 读取内容后删除临时 repomixFilePath 文件
+        await vscode.workspace.fs.delete(vscode.Uri.file(repomixFilePath));
+
+        // Parse the prompt data and update the result object
+        const promptDataString = promptData.toString();
+        await generateMermaidDiagram(promptDataString, context);
+      } catch (error) {
+        vscode.window.showErrorMessage(`Error reading file: ${error}`);
       }
-
-      // Read the prompt data from the repomix file
-      const repomixFilePath = path.join(workspacePath, repomixFileName)
-      // 读取文件内容
-      const promptData = await vscode.workspace.fs.readFile(
-        vscode.Uri.file(repomixFilePath)
-      )
-
-      // 读取内容后删除临时 repomixFilePath 文件
-      await vscode.workspace.fs.delete(vscode.Uri.file(repomixFilePath))
-
-      // Parse the prompt data and update the result object
-      const promptDataString = promptData.toString()
-      await generateMermaidDiagram(promptDataString, context);
-    } catch (error) {
-      vscode.window.showErrorMessage(`Error reading file: ${error}`);
     }
-  });
+  );
 
   context.subscriptions.push(generateFromSelection, generateFromFileOrFolder);
 }
 
-async function generateMermaidDiagram(inputText: string, context: vscode.ExtensionContext) {
+async function generateMermaidDiagram(
+  inputText: string,
+  context: vscode.ExtensionContext
+) {
   const config = vscode.workspace.getConfiguration('mermaidDeepseek');
   const openaiBaseUrl = config.get<string>('openaiBaseUrl');
   const openaiKey = config.get<string>('openaiKey');
   const openaiModel = config.get<string>('openaiModel');
-  const deepseekPrompt = config.get<string>('deepseekPrompt') || `${defaultMermaidPrompt}\n`;
+  const deepseekPrompt =
+    config.get<string>('deepseekPrompt') || `${defaultMermaidPrompt}\n`;
   const temperature = config.get<number>('temperature');
 
   if (!openaiKey) {
-    vscode.window.showErrorMessage('DeepSeek API Key is not configured. Please set it in settings.');
+    vscode.window.showErrorMessage(
+      'DeepSeek API Key is not configured. Please set it in settings.'
+    );
     return;
   }
 
   const openai = new OpenAI({
     apiKey: openaiKey,
-    baseURL: openaiBaseUrl
+    baseURL: openaiBaseUrl,
   });
 
-  vscode.window.withProgress({
-    location: vscode.ProgressLocation.Notification,
-    title: "Generating Mermaid Diagram...",
-    cancellable: false
-  }, async (progress) => {
-    try {
-      progress.report({ increment: 0, message: 'Calling DeepSeek API...' });
-      const completion = await openai.chat.completions.create({
-        model: openaiModel || "deepseek-chat",
-        temperature,
-        messages: [{ role: "user", content: deepseekPrompt + inputText }],
-      });
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Generating Mermaid Diagram...',
+      cancellable: false,
+    },
+    async (progress) => {
+      try {
+        progress.report({ increment: 0, message: 'Calling DeepSeek API...' });
+        const completion = await openai.chat.completions.create({
+          model: openaiModel || 'deepseek-chat',
+          temperature,
+          messages: [{ role: 'user', content: deepseekPrompt + inputText }],
+        });
 
-      let mermaidCode = completion.choices[0]?.message?.content;
+        let mermaidCode = completion.choices[0]?.message?.content;
 
-      if (mermaidCode) {
-        const regex = /```mermaid\s+(.*?)\s+```/s;
-        const match = mermaidCode.match(regex);
-        if (match) {
-          const extractedText = match[1]!.trim();
-          mermaidCode = extractedText;
+        if (mermaidCode) {
+          const regex = /```mermaid\s+(.*?)\s+```/s;
+          const match = mermaidCode.match(regex);
+          if (match) {
+            const extractedText = match[1]!.trim();
+            mermaidCode = extractedText;
+          }
         }
-      }
 
-      if (mermaidCode) {
-        progress.report({ increment: 100, message: 'Rendering Mermaid Diagram...' });
-        showMermaidPreview(mermaidCode, context);
-      } else {
-        vscode.window.showWarningMessage('DeepSeek API did not return Mermaid code.');
+        if (mermaidCode) {
+          progress.report({
+            increment: 100,
+            message: 'Rendering Mermaid Diagram...',
+          });
+          showMermaidPreview(mermaidCode, context);
+        } else {
+          vscode.window.showWarningMessage(
+            'DeepSeek API did not return Mermaid code.'
+          );
+        }
+      } catch (error: any) {
+        vscode.window.showErrorMessage(
+          `Error generating Mermaid diagram: ${error.message}`
+        );
+      } finally {
+        progress.report({ increment: 100, message: 'Finished.' });
       }
-
-    } catch (error: any) {
-      vscode.window.showErrorMessage(`Error generating Mermaid diagram: ${error.message}`);
-    } finally {
-      progress.report({ increment: 100, message: 'Finished.' });
     }
-  });
+  );
 }
 
-function showMermaidPreview(mermaidCode: string, context: vscode.ExtensionContext) {
+function showMermaidPreview(
+  mermaidCode: string,
+  context: vscode.ExtensionContext
+) {
   const panel = vscode.window.createWebviewPanel(
     'mermaidPreview',
     'Mermaid Preview',
     vscode.ViewColumn.Beside,
     {
       enableScripts: true,
-      retainContextWhenHidden: true
+      retainContextWhenHidden: true,
     }
   );
 
   panel.webview.html = getWebviewContent(mermaidCode);
-  panel.webview.onDidReceiveMessage(async (message) => {
-    if (message.command === 'downloadSVG') {
-      const uri = await vscode.window.showSaveDialog({
-        filters: {
-          'SVG Files': ['svg']
-        },
-        defaultUri: vscode.Uri.file(downloadSVGFilename)
-      });
+  panel.webview.onDidReceiveMessage(
+    async (message) => {
+      if (message.command === 'downloadSVG') {
+        const uri = await vscode.window.showSaveDialog({
+          filters: {
+            'SVG Files': ['svg'],
+          },
+          defaultUri: vscode.Uri.file(downloadSVGFilename),
+        });
 
-      if (uri) {
-        // 将SVG内容写入文件
-        await vscode.workspace.fs.writeFile(
-          uri,
-          Buffer.from(message.data)
-        );
-        vscode.window.showInformationMessage('SVG文件已保存！');
+        if (uri) {
+          // 将SVG内容写入文件
+          await vscode.workspace.fs.writeFile(uri, Buffer.from(message.data));
+          vscode.window.showInformationMessage('SVG文件已保存！');
+        }
+      } else if (message.command === 'showMessage') {
+        vscode.window.showInformationMessage(message.text);
+      } else if (message.command === 'showError') {
+        vscode.window.showErrorMessage(message.text);
       }
-    }
-  }, undefined, context.subscriptions);
+    },
+    undefined,
+    context.subscriptions
+  );
 }
 
 function getWebviewContent(mermaidCode: string) {
@@ -175,4 +206,4 @@ function getWebviewContent(mermaidCode: string) {
   return htmlContent.replace('${mermaidCode}', mermaidCode);
 }
 
-export function deactivate() { }
+export function deactivate() {}
