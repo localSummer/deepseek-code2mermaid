@@ -97,22 +97,11 @@
       }
 
       function copyMermaidCode() {
-        navigator.clipboard
-          .writeText(originalMermaidCode)
-          .then(() => {
-            // 通知用户复制成功
-            vscode.postMessage({
-              command: 'showMessage',
-              text: '已复制 Mermaid 代码到剪贴板！',
-            });
-          })
-          .catch((err) => {
-            console.error('复制失败:', err);
-            vscode.postMessage({
-              command: 'showError',
-              text: '复制失败: ' + err,
-            });
-          });
+        // 通过 vscode webview API 发送消息到插件
+        vscode.postMessage({
+          command: 'copyMermaidCode',
+          data: originalMermaidCode
+        });
       }
     </script>
     <script>

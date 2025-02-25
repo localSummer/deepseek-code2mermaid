@@ -189,10 +189,17 @@ function showMermaidPreview(
           await vscode.workspace.fs.writeFile(uri, Buffer.from(message.data));
           vscode.window.showInformationMessage('SVG文件已保存！');
         }
-      } else if (message.command === 'showMessage') {
-        vscode.window.showInformationMessage(message.text);
-      } else if (message.command === 'showError') {
-        vscode.window.showErrorMessage(message.text);
+      } else if (message.command === 'copyMermaidCode') {
+        vscode.env.clipboard.writeText(message.data).then(
+          () => {
+            vscode.window.showInformationMessage(
+              '已复制 Mermaid 代码到剪贴板！'
+            );
+          },
+          () => {
+            vscode.window.showErrorMessage('复制失败: ');
+          }
+        );
       }
     },
     undefined,
