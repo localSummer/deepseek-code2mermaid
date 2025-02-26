@@ -9,8 +9,13 @@ import { repomixFileName, downloadSVGFilename } from './constants';
 
 const execAsync = promisify(exec);
 
+/**
+ * 激活 VS Code 扩展。
+ * 注册两个命令：从选中的文本生成 Mermaid 图表和从文件或文件夹生成 Mermaid 图表。
+ * @param context - VS Code 扩展上下文对象。
+ */
 export function activate(context: vscode.ExtensionContext) {
-  // Command to generate diagram from selection
+  /** 注册命令：从选中的文本生成 Mermaid 图表 */
   let generateFromSelection = vscode.commands.registerCommand(
     'deepseek.generateMermaidDiagramFromSelection',
     async () => {
@@ -29,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Command to generate diagram from file
+  /** 注册命令：从文件或文件夹生成 Mermaid 图表 */
   let generateFromFileOrFolder = vscode.commands.registerCommand(
     'deepseek.generateMermaidDiagram',
     async (uri: vscode.Uri, selectedUris: vscode.Uri[] = []) => {
@@ -50,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       );
 
-      // Convert fileOrFolders array to string format for the repomix command
+      // 将文件或文件夹路径数组转换为字符串格式，用于 repomix 命令
       const filesOrFoldersString = absoluteFileOrFolders.join(',');
       const repomixCommand = `npx repomix --include "${filesOrFoldersString}" --output ${repomixFileName} --style markdown`;
 
@@ -65,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
           );
         }
 
-        // Read the prompt data from the repomix file
+        // 从 repomix 文件中读取提示数据
         const repomixFilePath = path.join(workspacePath, repomixFileName);
         // 读取文件内容
         const promptData = await vscode.workspace.fs.readFile(
@@ -75,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
         // 读取内容后删除临时 repomixFilePath 文件
         await vscode.workspace.fs.delete(vscode.Uri.file(repomixFilePath));
 
-        // Parse the prompt data and update the result object
+        // 解析提示数据并更新结果对象
         const promptDataString = promptData.toString();
         await generateMermaidDiagram(promptDataString, context);
       } catch (error) {
@@ -87,6 +92,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(generateFromSelection, generateFromFileOrFolder);
 }
 
+/**
+ * 生成 Mermaid 图表。
+ * 调用 DeepSeek API 生成 Mermaid 代码，并显示预览。
+ * @param inputText - 输入的文本内容。
+ * @param context - VS Code 扩展上下文对象。
+ */
 async function generateMermaidDiagram(
   inputText: string,
   context: vscode.ExtensionContext
@@ -159,6 +170,12 @@ async function generateMermaidDiagram(
   );
 }
 
+/**
+ * 显示 Mermaid 图表的预览。
+ * 创建一个 Webview 面板来显示生成的 Mermaid 图表。
+ * @param mermaidCode - 生成的 Mermaid 代码。
+ * @param context - VS Code 扩展上下文对象。
+ */
 function showMermaidPreview(
   mermaidCode: string,
   context: vscode.ExtensionContext
@@ -207,10 +224,17 @@ function showMermaidPreview(
   );
 }
 
+/**
+ * 获取 Webview 的 HTML 内容。
+ * 读取并替换 HTML 模板中的 Mermaid 代码。
+ * @param mermaidCode - 生成的 Mermaid 代码。
+ * @returns 替换后的 HTML 内容。
+ */
 function getWebviewContent(mermaidCode: string) {
   const htmlPath = path.join(__dirname, 'webview-content.html');
   let htmlContent = fs.readFileSync(htmlPath, 'utf-8');
   return htmlContent.replace('${mermaidCode}', mermaidCode);
 }
 
+/** 停用 VS Code 扩展。 */
 export function deactivate() { }
