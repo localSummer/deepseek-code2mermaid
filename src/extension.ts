@@ -210,13 +210,6 @@ function showMermaidPreview(
 function getWebviewContent(mermaidCode: string) {
   const htmlPath = path.join(__dirname, 'webview-content.html');
   let htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-
-  const assetsPath = vscode.Uri.file(
-    path.join(__dirname, 'assets', 'js', 'mermaid.min.js')
-  ).with({ scheme: 'vscode-resource' });
-
-  htmlContent = htmlContent.replace('${vscode.extensionUri}/assets/js/mermaid.min.js', assetsPath.toString());
-
   return htmlContent.replace('${mermaidCode}', mermaidCode);
 }
 

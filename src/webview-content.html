@@ -1,111 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mermaid Preview</title>
-    <script src="${vscode.extensionUri}/assets/js/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({ startOnLoad: true });
-    </script>
-    <style>
-      .controls {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        background: var(--vscode-editor-background);
-        padding: 5px;
-        border-radius: 4px;
-        display: flex;
-        gap: 5px;
-        z-index: 100;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mermaid Preview</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+  <style>
+    .controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: var(--vscode-editor-background);
+      padding: 5px;
+      border-radius: 4px;
+      display: flex;
+      gap: 5px;
+      z-index: 100;
+    }
+
+    .control-btn {
+      cursor: pointer;
+      padding: 5px;
+      background: var(--vscode-button-background);
+      border: none;
+      color: var(--vscode-button-foreground);
+      border-radius: 3px;
+    }
+
+    .control-btn:hover {
+      background: var(--vscode-button-hoverBackground);
+    }
+
+    #diagram-container {
+      transform-origin: top left;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls">
+    <button class="control-btn" onclick="zoomIn()">
+      <span class="codicon codicon-zoom-in"></span>
+    </button>
+    <button class="control-btn" onclick="zoomOut()">
+      <span class="codicon codicon-zoom-out"></span>
+    </button>
+    <button class="control-btn" onclick="downloadSVG()">
+      <span class="codicon codicon-cloud-download"></span>
+    </button>
+    <button class="control-btn" onclick="copyMermaidCode()">
+      <span class="codicon codicon-copy"></span>
+    </button>
+  </div>
+  <div id="diagram-container">
+    <div class="mermaid">${mermaidCode}</div>
+  </div>
+  <script>
+    let scale = 1;
+    const container = document.getElementById('diagram-container');
+
+    function zoomIn() {
+      scale *= 1.2;
+      updateZoom();
+    }
+
+    function zoomOut() {
+      scale *= 0.8;
+      updateZoom();
+    }
+
+    function updateZoom() {
+      container.style.transform = `scale(${scale})`;
+    }
+
+    function downloadSVG() {
+      const svgElement = document.querySelector('.mermaid svg');
+      if (!svgElement) {
+        console.error('没有找到SVG元素');
+        return;
       }
 
-      .control-btn {
-        cursor: pointer;
-        padding: 5px;
-        background: var(--vscode-button-background);
-        border: none;
-        color: var(--vscode-button-foreground);
-        border-radius: 3px;
-      }
+      // 获取SVG内容
+      const svgData = new XMLSerializer().serializeToString(svgElement);
 
-      .control-btn:hover {
-        background: var(--vscode-button-hoverBackground);
-      }
+      // 通过 vscode webview API 发送消息到插件
+      vscode.postMessage({
+        command: 'downloadSVG',
+        data: svgData,
+      });
+    }
 
-      #diagram-container {
-        transform-origin: top left;
-      }
-    </style>
-  </head>
+    function copyMermaidCode() {
+      // 通过 vscode webview API 发送消息到插件
+      vscode.postMessage({
+        command: 'copyMermaidCode',
+      });
+    }
+  </script>
+  <script>
+    const vscode = acquireVsCodeApi();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vscode-codicons/dist/codicon.css" />
+</body>
 
-  <body>
-    <div class="controls">
-      <button class="control-btn" onclick="zoomIn()">
-        <span class="codicon codicon-zoom-in"></span>
-      </button>
-      <button class="control-btn" onclick="zoomOut()">
-        <span class="codicon codicon-zoom-out"></span>
-      </button>
-      <button class="control-btn" onclick="downloadSVG()">
-        <span class="codicon codicon-cloud-download"></span>
-      </button>
-      <button class="control-btn" onclick="copyMermaidCode()">
-        <span class="codicon codicon-copy"></span>
-      </button>
-    </div>
-    <div id="diagram-container">
-      <div class="mermaid">${mermaidCode}</div>
-    </div>
-    <script>
-      let scale = 1;
-      const container = document.getElementById('diagram-container');
-
-      function zoomIn() {
-        scale *= 1.2;
-        updateZoom();
-      }
-
-      function zoomOut() {
-        scale *= 0.8;
-        updateZoom();
-      }
-
-      function updateZoom() {
-        container.style.transform = `scale(${scale})`;
-      }
-
-      function downloadSVG() {
-        const svgElement = document.querySelector('.mermaid svg');
-        if (!svgElement) {
-          console.error('没有找到SVG元素');
-          return;
-        }
-
-        // 获取SVG内容
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-
-        // 通过 vscode webview API 发送消息到插件
-        vscode.postMessage({
-          command: 'downloadSVG',
-          data: svgData,
-        });
-      }
-
-      function copyMermaidCode() {
-        // 通过 vscode webview API 发送消息到插件
-        vscode.postMessage({
-          command: 'copyMermaidCode',
-        });
-      }
-    </script>
-    <script>
-      const vscode = acquireVsCodeApi();
-    </script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/vscode-codicons/dist/codicon.css"
-    />
-  </body>
 </html>
