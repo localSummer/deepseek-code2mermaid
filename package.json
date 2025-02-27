@@ -1,9 +1,9 @@
 {
   "publisher": "localSummer",
   "name": "deepseek-code2mermaid",
-  "displayName": "deepseek-code2mermaid",
+  "displayName": "Deepseek Code To Mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图，提示代码的可读性",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "packageManager": "npm@10.5.0",
   "author": "localSummer <roamingcode@163.com>",
   "engines": {
