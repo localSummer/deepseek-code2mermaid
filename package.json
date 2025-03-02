@@ -87,14 +87,13 @@
     }
   },
   "scripts": {
-    "compile": "vite build && npm run copy-webview && npm run copy-assets",
+    "compile": "vite build && npm run copy-webview",
     "compile:pack": "npm run compile && vsce package -o dist/deepseek-code2mermaid.vsix --no-dependencies",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "copy-webview": "cp src/webview-content.html dist/extension/",
-    "copy-assets": "rm -rf dist/extension/assets && cp -r src/assets dist/extension/"
+    "copy-webview": "cp src/webview-content.html dist/extension/"
   },
   "devDependencies": {
     "@tomjs/vite-plugin-vscode": "^2.5.5",
