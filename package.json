@@ -1,9 +1,17 @@
 {
   "publisher": "localSummer",
   "name": "deepseek-code2mermaid",
-  "displayName": "DeepSeek Code to Mermaid",
+  "displayName": "DeepSeek Code2Mermaid",
   "description": "将代码的执行流程转为可在线预览的mermaid流程图",
-  "version": "0.0.24",
+  "keywords": [
+    "mermaid",
+    "diagram",
+    "code visualization",
+    "flow chart",
+    "deepseek",
+    "ai"
+  ],
+  "version": "0.0.25",
   "packageManager": "npm@10.5.0",
   "author": "localSummer <roamingcode@163.com>",
   "engines": {
@@ -36,19 +44,19 @@
       "editor/context": [
         {
           "command": "deepseek.generateMermaidDiagramFromSelection",
-          "group": "mermaidDeepSeek",
+          "group": "mermaidDeepseek",
           "when": "editorTextFocus"
         }
       ],
       "explorer/context": [
         {
           "command": "deepseek.generateMermaidDiagram",
-          "group": "mermaidDeepSeek"
+          "group": "mermaidDeepseek"
         }
       ]
     },
     "configuration": {
-      "title": "Mermaid DeepSeek Diagram Generator",
+      "title": "DeepSeek Code2Mermaid",
       "properties": {
         "mermaidDeepseek.openaiBaseUrl": {
           "type": "string",
@@ -64,7 +72,7 @@
           "default": "deepseek-chat",
           "description": "Model to use for DeepSeek API."
         },
-        "mermaidDeepSeek.temperature": {
+        "mermaidDeepseek.temperature": {
           "type": "number",
           "default": 0.1,
           "description": "Temperature for DeepSeek API."
