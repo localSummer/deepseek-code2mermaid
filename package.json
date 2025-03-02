@@ -2,7 +2,7 @@
   "publisher": "localSummer",
   "name": "deepseek-code2mermaid",
   "displayName": "DeepSeek Code2Mermaid",
-  "description": "将代码的执行流程转为可在线预览的mermaid流程图",
+  "description": "Visualize code execution flow as Mermaid diagrams (将代码的执行流程转为可在线预览的mermaid流程图)",
   "keywords": [
     "mermaid",
     "diagram",
@@ -11,15 +11,17 @@
     "deepseek",
     "ai"
   ],
-  "version": "0.0.25",
+  "version": "0.0.26",
   "packageManager": "npm@10.5.0",
   "author": "localSummer <roamingcode@163.com>",
   "engines": {
     "vscode": "^1.82.0"
   },
   "categories": [
-    "Programming Languages"
+    "Visualization",
+    "Other"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/localSummer/deepseek-code2mermaid"
@@ -44,14 +46,14 @@
       "editor/context": [
         {
           "command": "deepseek.generateMermaidDiagramFromSelection",
-          "group": "mermaidDeepseek",
+          "group": "navigation",
           "when": "editorTextFocus"
         }
       ],
       "explorer/context": [
         {
           "command": "deepseek.generateMermaidDiagram",
-          "group": "mermaidDeepseek"
+          "group": "navigation"
         }
       ]
     },
