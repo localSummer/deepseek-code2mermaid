@@ -18,6 +18,8 @@ export const defaultMermaidPrompt = `
 - 流程图应使用Mermaid语法，确保节点功能描述清晰，箭头明确表示执行顺序
 - 对于包含多个文件或模块的代码，需体现它们之间的调用关系及数据传递路径
 - Mermaid代码中不能包含函数调用的代码，应表示为"调用 Function/API/Component，参数 arg1，arg2"的形式
+- Mermaid节点内容描述需包含相关代码关键词，用于快速定位节点对应的代码
+- Mermaid节点内容描述中坚决不要出现不符合Mermaid语法的代码，如"()"、"[]"、"!"、"?"等符号
 
 ## OutputFormat
 Mermaid流程图代码，用户可直接复制并渲染。
